@@ -1,5 +1,5 @@
-FROM node:18-alpine
-
+FROM node:18-bullseye
+#sadasda
 WORKDIR /app
 
 # Copy package files and Prisma schema (needed for postinstall hook)
