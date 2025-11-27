@@ -1,0 +1,155 @@
+[
+  {
+    "id": "prog-1",
+    "titulo": "Desenvolvimento Frontend Moderno",
+    "instituicaoId": "rocketseat",
+    "area": "frontend",
+    "modalidade": "online",
+    "nivel": "intermediario",
+    "publicoAlvo": "Desenvolvedores com conhecimento básico em JavaScript",
+    "periodoInscricao": {
+      "inicio": "2024-01-15",
+      "fim": "2024-02-15"
+    },
+    "editalUrl": "https://example.com/edital-1",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "tags": ["React", "Next.js", "TypeScript", "Chakra UI", "Zustand"],
+    "resumo": "Domine as tecnologias mais modernas do desenvolvimento frontend.",
+    "descricaoCompleta": "Um programa completo que aborda React, Next.js, TypeScript e as melhores práticas de desenvolvimento frontend moderno. Inclui projetos práticos e mentoria especializada."
+  },
+  {
+    "id": "prog-2",
+    "titulo": "Data Science e Machine Learning",
+    "instituicaoId": "usp",
+    "area": "dados",
+    "modalidade": "hibrido",
+    "nivel": "avancado",
+    "publicoAlvo": "Profissionais com experiência em programação e estatística",
+    "periodoInscricao": {
+      "inicio": "2024-02-01",
+      "fim": "2024-03-01"
+    },
+    "editalUrl": "https://example.com/edital-2",
+    "cidade": "São José dos Campos",
+    "estado": "SP",
+    "tags": ["Python", "Pandas", "TensorFlow", "PyTorch", "SQL"],
+    "resumo": "Transforme dados em insights valiosos com machine learning.",
+    "descricaoCompleta": "Programa avançado em ciência de dados que cobre desde análise exploratória até modelos de machine learning em produção. Projetos reais com dados de empresas parceiras."
+  },
+  {
+    "id": "prog-3",
+    "titulo": "Arquitetura Backend com Node.js",
+    "instituicaoId": "cesar",
+    "area": "backend",
+    "modalidade": "presencial",
+    "nivel": "intermediario",
+    "publicoAlvo": "Desenvolvedores JavaScript que querem evoluir no backend",
+    "periodoInscricao": {
+      "inicio": "2024-01-20",
+      "fim": "2024-02-20"
+    },
+    "editalUrl": "https://example.com/edital-3",
+    "cidade": "Recife",
+    "estado": "PE",
+    "tags": ["Node.js", "Express", "MongoDB", "Docker", "API REST"],
+    "resumo": "Construa APIs robustas e escaláveis com Node.js.",
+    "descricaoCompleta": "Aprenda a desenvolver backends modernos com Node.js, incluindo arquitetura limpa, testes automatizados, containerização e deploy em cloud."
+  },
+  {
+    "id": "prog-4",
+    "titulo": "Cloud Computing com AWS",
+    "instituicaoId": "udemy",
+    "area": "cloud",
+    "modalidade": "online",
+    "nivel": "avancado",
+    "publicoAlvo": "Engenheiros de software e arquitetos de soluções",
+    "periodoInscricao": {
+      "inicio": "2024-03-01",
+      "fim": "2024-04-01"
+    },
+    "editalUrl": "https://example.com/edital-4",
+    "cidade": "Curitiba",
+    "estado": "PR",
+    "tags": ["AWS", "Lambda", "S3", "RDS", "CloudFormation"],
+    "resumo": "Domine a computação em nuvem com Amazon Web Services.",
+    "descricaoCompleta": "Programa completo de AWS que prepara para certificações e projetos reais. Inclui laboratórios práticos e projeto final de arquitetura cloud."
+  },
+  {
+    "id": "prog-5",
+    "titulo": "UX/UI Design Avançado",
+    "instituicaoId": "ufpe",
+    "area": "ux",
+    "modalidade": "hibrido",
+    "nivel": "intermediario",
+    "publicoAlvo": "Designers e profissionais interessados em experiência do usuário",
+    "periodoInscricao": {
+      "inicio": "2024-02-15",
+      "fim": "2024-03-15"
+    },
+    "editalUrl": "https://example.com/edital-5",
+    "cidade": "Florianópolis",
+    "estado": "SC",
+    "tags": ["Figma", "Design System", "Prototipagem", "User Research", "Usabilidade"],
+    "resumo": "Crie experiências digitais excepcionais centradas no usuário.",
+    "descricaoCompleta": "Programa que combina teoria e prática em UX/UI Design, com foco em metodologias ágeis, pesquisa com usuários e criação de design systems."
+  },
+  {
+    "id": "prog-6",
+    "titulo": "Desenvolvimento Mobile React Native",
+    "instituicaoId": "curso_em_video",
+    "area": "mobile",
+    "modalidade": "online",
+    "nivel": "iniciante",
+    "publicoAlvo": "Desenvolvedores web que querem migrar para mobile",
+    "periodoInscricao": {
+      "inicio": "2024-01-30",
+      "fim": "2024-02-28"
+    },
+    "editalUrl": "https://example.com/edital-6",
+    "cidade": "Fortaleza",
+    "estado": "CE",
+    "tags": ["React Native", "Expo", "Navigation", "AsyncStorage", "APIs"],
+    "resumo": "Desenvolva apps mobile nativos usando React Native.",
+    "descricaoCompleta": "Curso prático de React Native que vai desde os conceitos básicos até a publicação na App Store e Google Play. Projetos reais incluídos."
+  },
+  {
+    "id": "prog-7",
+    "titulo": "Segurança Cibernética e Ethical Hacking",
+    "instituicaoId": "cesar",
+    "area": "seguranca",
+    "modalidade": "presencial",
+    "nivel": "avancado",
+    "publicoAlvo": "Profissionais de TI e segurança da informação",
+    "periodoInscricao": {
+      "inicio": "2024-04-01",
+      "fim": "2024-05-01"
+    },
+    "editalUrl": "https://example.com/edital-7",
+    "cidade": "Porto Alegre",
+    "estado": "RS",
+    "tags": ["Pentest", "Ethical Hacking", "OWASP", "Criptografia", "Forensics"],
+    "resumo": "Torne-se um especialista em segurança cibernética.",
+    "descricaoCompleta": "Programa intensivo que aborda desde fundamentos de segurança até técnicas avançadas de penetration testing e análise forense digital."
+  },
+  {
+    "id": "prog-8",
+    "titulo": "Full Stack JavaScript",
+    "instituicaoId": "udemy",
+    "area": "frontend",
+    "modalidade": "hibrido",
+    "nivel": "intermediario",
+    "publicoAlvo": "Desenvolvedores que querem dominar o stack JavaScript completo",
+    "periodoInscricao": {
+      "inicio": "2024-03-15",
+      "fim": "2024-04-15"
+    },
+    "editalUrl": "https://example.com/edital-8",
+    "cidade": "Salvador",
+    "estado": "BA",
+    "tags": ["JavaScript", "React", "Node.js", "MongoDB", "Express"],
+    "resumo": "Domine o desenvolvimento full stack com JavaScript.",
+    "descricaoCompleta": "Programa completo que ensina desde frontend com React até backend com Node.js, incluindo bancos de dados e deploy em produção."
+  }
+]
+

@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "API Programas Instituicoes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Instituicoes",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/instituicoes",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instituicoes"
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Programas",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/programas",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "programas"
+          ]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    }
+  ]
+}

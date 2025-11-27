@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Instituicao {
+  id        String   @id
+  nome      String
+  logoUrl   String?
+  siteUrl   String?
+  descricao String?
+  programas Programa[]
+}
+
+model Programa {
+  id               String   @id
+  titulo           String
+  instituicaoId    String
+  area             String
+  modalidade       String
+  nivel            String
+  publicoAlvo      String
+  periodoInicio    DateTime
+  periodoFim       DateTime
+  editalUrl        String?
+  cidade           String
+  estado           String
+  tags             String[]
+  resumo           String
+  descricaoCompleta String
+  instituicao      Instituicao @relation(fields: [instituicaoId], references: [id])
+}
