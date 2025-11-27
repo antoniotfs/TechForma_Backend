@@ -1,5 +1,5 @@
 FROM node:18-bullseye
-#sadasda
+
 WORKDIR /app
 
 # Copy package files and Prisma schema (needed for postinstall hook)
@@ -16,8 +16,11 @@ COPY . .
 # Ensure Prisma Client is generated (redundant but safe)
 RUN npx prisma generate
 
+# Make startup script executable
+RUN chmod +x scripts/start.sh
+
 # Expose port
 EXPOSE 3001
 
-# Start the application
+# Start the application (Railway will use startCommand from railway.json)
 CMD ["npm", "start"]
