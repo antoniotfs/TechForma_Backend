@@ -1,44 +1,279 @@
 {
   "info": {
-    "name": "API Programas Instituicoes",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "name": "API Programas e Instituições",
+    "description": "Collection completa para testar todos os endpoints da API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
   },
   "item": [
     {
-      "name": "List Instituicoes",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "{{baseUrl}}/instituicoes",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "instituicoes"
-          ]
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Verifica o status da aplicação e conexão com o banco de dados"
+          },
+          "response": []
+        },
+        {
+          "name": "Root",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Endpoint raiz da API"
+          },
+          "response": []
         }
-      }
+      ]
     },
     {
-      "name": "List Programas",
-      "request": {
-        "method": "GET",
-        "url": {
-          "raw": "{{baseUrl}}/programas",
-          "host": [
-            "{{baseUrl}}"
-          ],
-          "path": [
-            "programas"
-          ]
+      "name": "Instituições",
+      "item": [
+        {
+          "name": "Listar Instituições",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instituicoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["instituicoes"]
+            },
+            "description": "Retorna todas as instituições cadastradas"
+          },
+          "response": []
+        },
+        {
+          "name": "Obter Instituição por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instituicoes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["instituicoes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cesar",
+                  "description": "ID da instituição"
+                }
+              ]
+            },
+            "description": "Retorna uma instituição específica pelo ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Instituição",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"nova-instituicao\",\n  \"nome\": \"Nova Instituição de Tecnologia\",\n  \"logoUrl\": \"/nova-instituicao.jpg\",\n  \"siteUrl\": \"https://www.novainstituicao.com.br\",\n  \"descricao\": \"Uma nova instituição focada em tecnologia e inovação\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/instituicoes",
+              "host": ["{{baseUrl}}"],
+              "path": ["instituicoes"]
+            },
+            "description": "Cria uma nova instituição"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Instituição",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Instituição Atualizada\",\n  \"logoUrl\": \"/logo-atualizado.jpg\",\n  \"siteUrl\": \"https://www.instituicao-atualizada.com.br\",\n  \"descricao\": \"Descrição atualizada da instituição\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/instituicoes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["instituicoes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "cesar",
+                  "description": "ID da instituição a ser atualizada"
+                }
+              ]
+            },
+            "description": "Atualiza uma instituição existente"
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Instituição",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instituicoes/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["instituicoes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "nova-instituicao",
+                  "description": "ID da instituição a ser deletada"
+                }
+              ]
+            },
+            "description": "Remove uma instituição. Atenção: só funciona se não houver programas associados!"
+          },
+          "response": []
         }
-      }
+      ]
+    },
+    {
+      "name": "Programas",
+      "item": [
+        {
+          "name": "Listar Programas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/programas",
+              "host": ["{{baseUrl}}"],
+              "path": ["programas"]
+            },
+            "description": "Retorna todos os programas cadastrados"
+          },
+          "response": []
+        },
+        {
+          "name": "Obter Programa por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/programas/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["programas", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "prog-1",
+                  "description": "ID do programa"
+                }
+              ]
+            },
+            "description": "Retorna um programa específico pelo ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Programa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"prog-novo\",\n  \"titulo\": \"Novo Programa de Desenvolvimento\",\n  \"instituicaoId\": \"rocketseat\",\n  \"area\": \"backend\",\n  \"modalidade\": \"online\",\n  \"nivel\": \"iniciante\",\n  \"publicoAlvo\": \"Desenvolvedores iniciantes\",\n  \"periodoInicio\": \"2024-12-01T00:00:00.000Z\",\n  \"periodoFim\": \"2024-12-31T23:59:59.000Z\",\n  \"editalUrl\": \"https://example.com/edital-novo\",\n  \"cidade\": \"São Paulo\",\n  \"estado\": \"SP\",\n  \"tags\": [\"Node.js\", \"Express\", \"API\"],\n  \"resumo\": \"Programa completo de desenvolvimento backend\",\n  \"descricaoCompleta\": \"Um programa completo que ensina desenvolvimento backend do zero, incluindo Node.js, Express, banco de dados e deploy.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/programas",
+              "host": ["{{baseUrl}}"],
+              "path": ["programas"]
+            },
+            "description": "Cria um novo programa. IMPORTANTE: periodoInicio e periodoFim devem ser strings ISO (DateTime)"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Programa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Programa Atualizado\",\n  \"nivel\": \"avancado\",\n  \"resumo\": \"Resumo atualizado do programa\",\n  \"descricaoCompleta\": \"Descrição completa atualizada do programa\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/programas/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["programas", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "prog-1",
+                  "description": "ID do programa a ser atualizado"
+                }
+              ]
+            },
+            "description": "Atualiza um programa existente. Você pode atualizar apenas os campos que desejar."
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Programa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/programas/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["programas", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "prog-novo",
+                  "description": "ID do programa a ser deletado"
+                }
+              ]
+            },
+            "description": "Remove um programa"
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3001"
+      "value": "http://localhost:3001",
+      "type": "string",
+      "description": "URL base da API. Altere para a URL do Railway em produção."
     }
   ]
 }

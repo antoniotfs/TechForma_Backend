@@ -1,97 +1,952 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "API de Programas e Institui\u00e7\u00f5es",
-    "version": "1.0.0"
+    "title": "API de Programas e Instituições",
+    "description": "API REST completa para gerenciar instituições de ensino e programas educacionais. Permite criar, listar, atualizar e deletar instituições e seus programas associados.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "API Support"
+    }
   },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Servidor local de desenvolvimento"
+    },
+    {
+      "url": "https://seu-projeto.up.railway.app",
+      "description": "Servidor de produção (Railway)"
+    }
+  ],
   "paths": {
-    "/instituicoes": {
+    "/": {
       "get": {
-        "summary": "Listar institui\u00e7\u00f5es",
+        "summary": "Health Check Básico",
+        "description": "Endpoint raiz que retorna o status básico da API",
+        "tags": ["Health"],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "API está funcionando",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                },
+                "example": {
+                  "ok": true
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check Completo",
+        "description": "Verifica o status da aplicação e a conexão com o banco de dados",
+        "tags": ["Health"],
+        "responses": {
+          "200": {
+            "description": "Aplicação e banco de dados estão funcionando",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "status": "ok",
+                  "database": "connected"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Banco de dados não está disponível",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "database": {
+                      "type": "string",
+                      "example": "disconnected"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instituicoes": {
+      "get": {
+        "summary": "Listar todas as instituições",
+        "description": "Retorna uma lista com todas as instituições cadastradas, incluindo seus programas associados",
+        "tags": ["Instituições"],
+        "responses": {
+          "200": {
+            "description": "Lista de instituições retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Instituicao"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "cesar",
+                    "nome": "CESAR",
+                    "logoUrl": "/Cesar.jpg",
+                    "siteUrl": "https://www.cesar.org.br/",
+                    "descricao": "Um centro de pesquisa e inovação sem fins lucrativos, com sede no Recife, focado em desenvolvimento de software e consultoria em tecnologia.",
+                    "programas": []
+                  }
+                ]
+              }
+            }
           }
         }
       },
       "post": {
-        "summary": "Criar institui\u00e7\u00e3o",
+        "summary": "Criar nova instituição",
+        "description": "Cria uma nova instituição no sistema. O campo 'id' deve ser único.",
+        "tags": ["Instituições"],
+        "requestBody": {
+          "required": true,
+          "description": "Dados da instituição a ser criada",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstituicaoInput"
+              },
+              "example": {
+                "id": "nova-instituicao",
+                "nome": "Nova Instituição de Tecnologia",
+                "logoUrl": "/nova-instituicao.jpg",
+                "siteUrl": "https://www.novainstituicao.com.br",
+                "descricao": "Uma nova instituição focada em tecnologia e inovação"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Instituição criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instituicao"
+                },
+                "example": {
+                  "id": "nova-instituicao",
+                  "nome": "Nova Instituição de Tecnologia",
+                  "logoUrl": "/nova-instituicao.jpg",
+                  "siteUrl": "https://www.novainstituicao.com.br",
+                  "descricao": "Uma nova instituição focada em tecnologia e inovação"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro na validação dos dados ou ID já existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Unique constraint failed on the fields: (`id`)"
+                }
+              }
+            }
           }
         }
       }
     },
     "/instituicoes/{id}": {
       "get": {
-        "summary": "Obter institui\u00e7\u00e3o por id",
+        "summary": "Obter instituição por ID",
+        "description": "Retorna os detalhes de uma instituição específica pelo seu ID, incluindo todos os programas associados",
+        "tags": ["Instituições"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único da instituição",
+            "schema": {
+              "type": "string"
+            },
+            "example": "cesar"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Instituição encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instituicao"
+                },
+                "example": {
+                  "id": "cesar",
+                  "nome": "CESAR",
+                  "logoUrl": "/Cesar.jpg",
+                  "siteUrl": "https://www.cesar.org.br/",
+                  "descricao": "Um centro de pesquisa e inovação sem fins lucrativos, com sede no Recife, focado em desenvolvimento de software e consultoria em tecnologia.",
+                  "programas": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instituição não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Instituicao not found"
+                }
+              }
+            }
           }
         }
       },
       "put": {
-        "summary": "Atualizar institui\u00e7\u00e3o",
+        "summary": "Atualizar instituição",
+        "description": "Atualiza os dados de uma instituição existente. Você pode atualizar apenas os campos que desejar.",
+        "tags": ["Instituições"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único da instituição a ser atualizada",
+            "schema": {
+              "type": "string"
+            },
+            "example": "cesar"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Dados a serem atualizados (todos os campos são opcionais, exceto que não pode alterar o ID)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstituicaoUpdate"
+              },
+              "example": {
+                "nome": "CESAR - Centro de Estudos e Sistemas Avançados do Recife",
+                "descricao": "Descrição atualizada da instituição"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Instituição atualizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instituicao"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro na validação dos dados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instituição não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "summary": "Remover institui\u00e7\u00e3o",
+        "summary": "Deletar instituição",
+        "description": "Remove uma instituição do sistema. ⚠️ ATENÇÃO: Só é possível deletar uma instituição se ela não tiver programas associados.",
+        "tags": ["Instituições"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único da instituição a ser deletada",
+            "schema": {
+              "type": "string"
+            },
+            "example": "nova-instituicao"
+          }
+        ],
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "Instituição deletada com sucesso (sem conteúdo na resposta)"
+          },
+          "400": {
+            "description": "Não é possível deletar instituição com programas associados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Foreign key constraint failed"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Instituição não encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
     },
     "/programas": {
       "get": {
-        "summary": "Listar programas",
+        "summary": "Listar todos os programas",
+        "description": "Retorna uma lista com todos os programas educacionais cadastrados",
+        "tags": ["Programas"],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Lista de programas retornada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Programa"
+                  }
+                },
+                "example": [
+                  {
+                    "id": "prog-1",
+                    "titulo": "Desenvolvimento Frontend Moderno",
+                    "instituicaoId": "rocketseat",
+                    "area": "frontend",
+                    "modalidade": "online",
+                    "nivel": "intermediario",
+                    "publicoAlvo": "Desenvolvedores com conhecimento básico em JavaScript",
+                    "periodoInicio": "2024-01-15T00:00:00.000Z",
+                    "periodoFim": "2024-02-15T23:59:59.000Z",
+                    "editalUrl": "https://example.com/edital-1",
+                    "cidade": "São Paulo",
+                    "estado": "SP",
+                    "tags": ["React", "Next.js", "TypeScript"],
+                    "resumo": "Domine as tecnologias mais modernas do desenvolvimento frontend.",
+                    "descricaoCompleta": "Um programa completo que aborda React, Next.js, TypeScript e as melhores práticas de desenvolvimento frontend moderno."
+                  }
+                ]
+              }
+            }
           }
         }
       },
       "post": {
-        "summary": "Criar programa",
+        "summary": "Criar novo programa",
+        "description": "Cria um novo programa educacional. ⚠️ IMPORTANTE: O campo 'instituicaoId' deve referenciar uma instituição existente. Os campos 'periodoInicio' e 'periodoFim' devem ser strings no formato ISO 8601 (DateTime).",
+        "tags": ["Programas"],
+        "requestBody": {
+          "required": true,
+          "description": "Dados do programa a ser criado",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaInput"
+              },
+              "example": {
+                "id": "prog-novo",
+                "titulo": "Novo Programa de Desenvolvimento",
+                "instituicaoId": "rocketseat",
+                "area": "backend",
+                "modalidade": "online",
+                "nivel": "iniciante",
+                "publicoAlvo": "Desenvolvedores iniciantes",
+                "periodoInicio": "2024-12-01T00:00:00.000Z",
+                "periodoFim": "2024-12-31T23:59:59.000Z",
+                "editalUrl": "https://example.com/edital-novo",
+                "cidade": "São Paulo",
+                "estado": "SP",
+                "tags": ["Node.js", "Express", "API"],
+                "resumo": "Programa completo de desenvolvimento backend",
+                "descricaoCompleta": "Um programa completo que ensina desenvolvimento backend do zero, incluindo Node.js, Express, banco de dados e deploy."
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Programa criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Programa"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro na validação dos dados, ID já existe ou instituicaoId não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Foreign key constraint failed on the field: `instituicaoId`"
+                }
+              }
+            }
           }
         }
       }
     },
     "/programas/{id}": {
       "get": {
-        "summary": "Obter programa por id",
+        "summary": "Obter programa por ID",
+        "description": "Retorna os detalhes de um programa específico pelo seu ID",
+        "tags": ["Programas"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único do programa",
+            "schema": {
+              "type": "string"
+            },
+            "example": "prog-1"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Programa encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Programa"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Programa não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Programa not found"
+                }
+              }
+            }
           }
         }
       },
       "put": {
         "summary": "Atualizar programa",
+        "description": "Atualiza os dados de um programa existente. Você pode atualizar apenas os campos que desejar.",
+        "tags": ["Programas"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único do programa a ser atualizado",
+            "schema": {
+              "type": "string"
+            },
+            "example": "prog-1"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Dados a serem atualizados (todos os campos são opcionais)",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgramaUpdate"
+              },
+              "example": {
+                "titulo": "Programa Atualizado",
+                "nivel": "avancado",
+                "resumo": "Resumo atualizado do programa"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Programa atualizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Programa"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro na validação dos dados",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Programa não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       },
       "delete": {
-        "summary": "Remover programa",
+        "summary": "Deletar programa",
+        "description": "Remove um programa do sistema",
+        "tags": ["Programas"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único do programa a ser deletado",
+            "schema": {
+              "type": "string"
+            },
+            "example": "prog-novo"
+          }
+        ],
         "responses": {
           "204": {
-            "description": "No Content"
+            "description": "Programa deletado com sucesso (sem conteúdo na resposta)"
+          },
+          "404": {
+            "description": "Programa não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
     }
-  }
+  },
+  "components": {
+    "schemas": {
+      "Instituicao": {
+        "type": "object",
+        "required": ["id", "nome"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único da instituição",
+            "example": "cesar"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome da instituição",
+            "example": "CESAR"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do logo da instituição",
+            "example": "/Cesar.jpg"
+          },
+          "siteUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do site oficial da instituição",
+            "example": "https://www.cesar.org.br/"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição detalhada da instituição",
+            "example": "Um centro de pesquisa e inovação sem fins lucrativos"
+          },
+          "programas": {
+            "type": "array",
+            "description": "Lista de programas associados à instituição",
+            "items": {
+              "$ref": "#/components/schemas/Programa"
+            }
+          }
+        }
+      },
+      "InstituicaoInput": {
+        "type": "object",
+        "required": ["id", "nome"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único da instituição (deve ser único no sistema)",
+            "example": "nova-instituicao"
+          },
+          "nome": {
+            "type": "string",
+            "description": "Nome da instituição",
+            "example": "Nova Instituição de Tecnologia"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do logo da instituição",
+            "example": "/nova-instituicao.jpg"
+          },
+          "siteUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do site oficial da instituição",
+            "example": "https://www.novainstituicao.com.br"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição detalhada da instituição",
+            "example": "Uma nova instituição focada em tecnologia e inovação"
+          }
+        }
+      },
+      "InstituicaoUpdate": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string",
+            "description": "Nome da instituição"
+          },
+          "logoUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do logo da instituição"
+          },
+          "siteUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do site oficial da instituição"
+          },
+          "descricao": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição detalhada da instituição"
+          }
+        }
+      },
+      "Programa": {
+        "type": "object",
+        "required": ["id", "titulo", "instituicaoId", "area", "modalidade", "nivel", "publicoAlvo", "periodoInicio", "periodoFim", "cidade", "estado", "tags", "resumo", "descricaoCompleta"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do programa",
+            "example": "prog-1"
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Título do programa",
+            "example": "Desenvolvimento Frontend Moderno"
+          },
+          "instituicaoId": {
+            "type": "string",
+            "description": "ID da instituição responsável pelo programa",
+            "example": "rocketseat"
+          },
+          "area": {
+            "type": "string",
+            "description": "Área de conhecimento do programa",
+            "example": "frontend",
+            "enum": ["frontend", "backend", "mobile", "dados", "cloud", "ux", "seguranca"]
+          },
+          "modalidade": {
+            "type": "string",
+            "description": "Modalidade de ensino",
+            "example": "online",
+            "enum": ["online", "presencial", "hibrido"]
+          },
+          "nivel": {
+            "type": "string",
+            "description": "Nível de dificuldade do programa",
+            "example": "intermediario",
+            "enum": ["iniciante", "intermediario", "avancado"]
+          },
+          "publicoAlvo": {
+            "type": "string",
+            "description": "Público-alvo do programa",
+            "example": "Desenvolvedores com conhecimento básico em JavaScript"
+          },
+          "periodoInicio": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de início do período de inscrição (formato ISO 8601)",
+            "example": "2024-01-15T00:00:00.000Z"
+          },
+          "periodoFim": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de fim do período de inscrição (formato ISO 8601)",
+            "example": "2024-02-15T23:59:59.000Z"
+          },
+          "editalUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do edital do programa",
+            "example": "https://example.com/edital-1"
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Cidade onde o programa é oferecido",
+            "example": "São Paulo"
+          },
+          "estado": {
+            "type": "string",
+            "description": "Estado onde o programa é oferecido (sigla)",
+            "example": "SP"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Lista de tags/tecnologias relacionadas ao programa",
+            "items": {
+              "type": "string"
+            },
+            "example": ["React", "Next.js", "TypeScript", "Chakra UI", "Zustand"]
+          },
+          "resumo": {
+            "type": "string",
+            "description": "Resumo breve do programa",
+            "example": "Domine as tecnologias mais modernas do desenvolvimento frontend."
+          },
+          "descricaoCompleta": {
+            "type": "string",
+            "description": "Descrição completa e detalhada do programa",
+            "example": "Um programa completo que aborda React, Next.js, TypeScript e as melhores práticas de desenvolvimento frontend moderno. Inclui projetos práticos e mentoria especializada."
+          }
+        }
+      },
+      "ProgramaInput": {
+        "type": "object",
+        "required": ["id", "titulo", "instituicaoId", "area", "modalidade", "nivel", "publicoAlvo", "periodoInicio", "periodoFim", "cidade", "estado", "tags", "resumo", "descricaoCompleta"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identificador único do programa (deve ser único no sistema)",
+            "example": "prog-novo"
+          },
+          "titulo": {
+            "type": "string",
+            "description": "Título do programa",
+            "example": "Novo Programa de Desenvolvimento"
+          },
+          "instituicaoId": {
+            "type": "string",
+            "description": "ID da instituição responsável pelo programa (deve existir)",
+            "example": "rocketseat"
+          },
+          "area": {
+            "type": "string",
+            "description": "Área de conhecimento do programa",
+            "example": "backend"
+          },
+          "modalidade": {
+            "type": "string",
+            "description": "Modalidade de ensino",
+            "example": "online"
+          },
+          "nivel": {
+            "type": "string",
+            "description": "Nível de dificuldade do programa",
+            "example": "iniciante"
+          },
+          "publicoAlvo": {
+            "type": "string",
+            "description": "Público-alvo do programa",
+            "example": "Desenvolvedores iniciantes"
+          },
+          "periodoInicio": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de início do período de inscrição (formato ISO 8601: YYYY-MM-DDTHH:mm:ss.sssZ)",
+            "example": "2024-12-01T00:00:00.000Z"
+          },
+          "periodoFim": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data e hora de fim do período de inscrição (formato ISO 8601: YYYY-MM-DDTHH:mm:ss.sssZ)",
+            "example": "2024-12-31T23:59:59.000Z"
+          },
+          "editalUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL do edital do programa",
+            "example": "https://example.com/edital-novo"
+          },
+          "cidade": {
+            "type": "string",
+            "description": "Cidade onde o programa é oferecido",
+            "example": "São Paulo"
+          },
+          "estado": {
+            "type": "string",
+            "description": "Estado onde o programa é oferecido (sigla)",
+            "example": "SP"
+          },
+          "tags": {
+            "type": "array",
+            "description": "Lista de tags/tecnologias relacionadas ao programa",
+            "items": {
+              "type": "string"
+            },
+            "example": ["Node.js", "Express", "API"]
+          },
+          "resumo": {
+            "type": "string",
+            "description": "Resumo breve do programa",
+            "example": "Programa completo de desenvolvimento backend"
+          },
+          "descricaoCompleta": {
+            "type": "string",
+            "description": "Descrição completa e detalhada do programa",
+            "example": "Um programa completo que ensina desenvolvimento backend do zero, incluindo Node.js, Express, banco de dados e deploy."
+          }
+        }
+      },
+      "ProgramaUpdate": {
+        "type": "object",
+        "properties": {
+          "titulo": {
+            "type": "string"
+          },
+          "instituicaoId": {
+            "type": "string"
+          },
+          "area": {
+            "type": "string"
+          },
+          "modalidade": {
+            "type": "string"
+          },
+          "nivel": {
+            "type": "string"
+          },
+          "publicoAlvo": {
+            "type": "string"
+          },
+          "periodoInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "periodoFim": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "editalUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "cidade": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "resumo": {
+            "type": "string"
+          },
+          "descricaoCompleta": {
+            "type": "string"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          },
+          "database": {
+            "type": "string",
+            "example": "connected"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Mensagem de erro descritiva",
+            "example": "Instituicao not found"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Endpoints para verificar o status da API e banco de dados"
+    },
+    {
+      "name": "Instituições",
+      "description": "Operações CRUD para gerenciar instituições de ensino"
+    },
+    {
+      "name": "Programas",
+      "description": "Operações CRUD para gerenciar programas educacionais"
+    }
+  ]
 }
