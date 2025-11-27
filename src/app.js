@@ -15,7 +15,11 @@ const app = express();
 
 // Logging middleware para debug
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl || req.path}`);
+  console.log(`Headers:`, JSON.stringify(req.headers, null, 2));
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`Body:`, JSON.stringify(req.body, null, 2));
+  }
   next();
 });
 
@@ -27,7 +31,13 @@ const port = process.env.PORT || 3001;
 const instituicoesRouter = require('./routes/instituicoes');
 const programasRouter = require('./routes/programas');
 
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi));
+// Swagger UI - deve vir antes das rotas da API para evitar conflitos
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'API - Programas e Instituições'
+}));
+
+// Rotas da API - devem vir depois do Swagger
 app.use('/instituicoes', instituicoesRouter(prisma));
 app.use('/programas', programasRouter(prisma));
 
