@@ -2,16 +2,18 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and Prisma schema (needed for postinstall hook)
 COPY package*.json ./
+COPY prisma ./prisma
 
 # Install all dependencies (including dev for Prisma CLI)
+# This will run postinstall which generates Prisma Client
 RUN npm ci
 
-# Copy source code
+# Copy rest of source code
 COPY . .
 
-# Generate Prisma Client
+# Ensure Prisma Client is generated (redundant but safe)
 RUN npx prisma generate
 
 # Expose port
