@@ -14,7 +14,7 @@
       "description": "Servidor local de desenvolvimento"
     },
     {
-      "url": "http://techformabackend-production.up.railway.app",
+      "url": "techformabackend-production.up.railway.app",
       "description": "Servidor de produção (Railway)"
     }
   ],
