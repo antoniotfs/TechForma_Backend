@@ -1,144 +1,210 @@
-# Projeto Backend (scaffold gerado)
+## Visão geral
 
-Este projeto é um *scaffold* para um backend **Express + Prisma + PostgreSQL** gerado com base nos mocks que você enviou.
+Backend em **Node.js + Express + Prisma + PostgreSQL**, com documentação **OpenAPI/Swagger** e estrutura em camadas:
 
-## O que foi gerado
-- Estrutura de pastas modular (routes, controllers, prisma)
-- `prisma/schema.prisma` com modelos `Instituicao` e `Programa`
-- Rotas REST:
-  - GET/POST/PUT/DELETE `/instituicoes`
-  - GET/POST/PUT/DELETE `/programas`
-- Swagger UI exposto em `/docs` via `openapi.json`
-- Script de seed `node scripts/seed.js` (necessita arquivos JSON em `data/`)
+- **Routes** → recebem a requisição HTTP e delegam
+- **Controllers** → orquestram a chamada de serviços e montam a resposta
+- **Services** → concentram a regra de negócio
+- **Repositories** → fazem o acesso ao banco via Prisma
 
-## Como usar (local)
-1. Copie os arquivos de mocks enviados na sessão para a pasta `data/` em formato JSON:
-   - **Origem (no workspace atual):**
-     - /mnt/data/instituicoes.ts
-     - /mnt/data/programas.ts
-   - **Destino (neste projeto):**
-     - projeto-backend/data/instituicoes.json
-     - projeto-backend/data/programas.json
+As rotas e comportamentos principais da API são:
 
-   > Observação: os arquivos enviados originalmente estão em TypeScript. Você pode:
-   > - Abrir /mnt/data/instituicoes.ts e /mnt/data/programas.ts, copiar somente os arrays e salvar como JSON (remova o `export const ...` e os tipos).
-   > - Ou executar uma pequena conversão para JSON.
+- `GET /instituicoes`, `POST /instituicoes`, `PUT /instituicoes/:id`, `DELETE /instituicoes/:id`
+- `GET /programas`, `POST /programas`, `PUT /programas/:id`, `DELETE /programas/:id`
+- `GET /` (health básico)
+- `GET /health` (health com verificação de banco)
 
-2. Instale dependências:
+> Observação: a refatoração em camadas **não altera as URLs, métodos HTTP nem os status codes esperados**; apenas organiza o código internamente.
+
+---
+
+## Requisitos
+
+- **Node.js** >= 18  
+- **npm** >= 8  
+- **PostgreSQL** (local, via Docker ou via Railway)
+
+---
+
+## Variáveis de ambiente
+
+Crie um arquivo `.env` na raiz do projeto com, no mínimo:
+
+```env
+DATABASE_URL="postgresql://usuario:senha@localhost:5432/projeto_backend?schema=public"
+PORT=3001
+NODE_ENV=development
+```
+
+Se você usar o `docker-compose.yml` incluso, pode usar:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/projeto_backend?schema=public"
+PORT=3001
+NODE_ENV=development
+```
+
+---
+
+## Como rodar o projeto localmente
+
+### 1. Instalar dependências
+
 ```bash
 npm install
 ```
 
-3. Configure o banco criando um arquivo `.env` na raiz do projeto:
-```env
-DATABASE_URL="postgresql://usuario:senha@localhost:5432/projeto_backend?schema=public"
-PORT=3001
+### 2. Subir o PostgreSQL
+
+- **Opção A – PostgreSQL já instalado na máquina**
+  - Crie um banco (ex.: `projeto_backend`);
+  - Ajuste a `DATABASE_URL` no `.env` apontando para esse banco.
+
+- **Opção B – usando Docker Compose (recomendado)**
+
+```bash
+docker-compose up -d
 ```
 
-   **Ou use Docker Compose para subir o PostgreSQL automaticamente:**
-   ```bash
-   docker-compose up -d
-   ```
-   
-   Isso criará um banco PostgreSQL local. Use esta URL no `.env`:
-   ```env
-   DATABASE_URL="postgresql://postgres:postgres@localhost:5432/projeto_backend?schema=public"
-   ```
+Isso cria um PostgreSQL local com usuário `postgres`, senha `postgres` e banco `projeto_backend`.
 
-4. Gere client Prisma e rode migration:
+### 3. Rodar comandos do Prisma
+
+- **Gerar o client Prisma**
+
 ```bash
 npx prisma generate
+```
+
+- **Criar/atualizar o schema com migrations (dev)**
+
+```bash
 npx prisma migrate dev --name init
 ```
 
-5. Rode o seed:
+- **Opcional: aplicar o schema sem criar migrations (ambientes efêmeros)**
+
+```bash
+npx prisma db push
+```
+
+### 4. Popular o banco (seed)
+
+Os arquivos JSON já estão em `data/`:
+
+- `data/instituicoes.json`
+- `data/programas.json`
+
+Execute:
+
 ```bash
 node scripts/seed.js
 ```
 
-6. Inicie a API:
+### 5. Iniciar o servidor
+
+Desenvolvimento (com reload, se configurado no `package.json`):
+
 ```bash
 npm run dev
-# ou
+```
+
+Produção/local simples:
+
+```bash
 npm start
+# ou diretamente:
+node src/app.js
 ```
 
-7. Acesse:
-- API root: http://localhost:3001/
-- Swagger UI: http://localhost:3001/docs
+### 6. Testar a API e o Swagger
 
-## Deploy no Railway
+- **API root**: `http://localhost:3001/`  
+- **Health check**: `http://localhost:3001/health`  
+- **Swagger UI**: `http://localhost:3001/docs`
 
-### Pré-requisitos
-- Conta no [Railway](https://railway.app)
-- Git configurado
-- Repositório GitHub/GitLab/Bitbucket (opcional, mas recomendado)
+A documentação é servida a partir do arquivo `openapi.json` na raiz do projeto, via `swagger-ui-express` configurado em `src/app.js`.
 
-### Passo a passo
+---
 
-1. **Faça commit e push do código para o Git:**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin <seu-repositorio-url>
-   git push -u origin main
-   ```
+## Conexão com PostgreSQL
 
-2. **Crie um novo projeto no Railway:**
-   - Acesse [railway.app](https://railway.app)
-   - Clique em "New Project"
-   - Escolha "Deploy from GitHub repo" (ou faça upload manual)
+- **Localmente (sem Docker)**:
+  - Ajuste a `DATABASE_URL` com host/porta/usuário/senha do seu PostgreSQL;
+  - Exemplo:
 
-3. **Adicione o banco de dados PostgreSQL:**
-   - No projeto do Railway, clique em "New" → "Database" → "Add PostgreSQL"
-   - O Railway criará automaticamente uma variável `DATABASE_URL` no ambiente
+    ```env
+    DATABASE_URL="postgresql://postgres:postgres@localhost:5432/projeto_backend?schema=public"
+    ```
 
-4. **Configure as variáveis de ambiente:**
-   - No serviço da aplicação, vá em "Variables"
-   - Verifique se `DATABASE_URL` está configurada (geralmente já vem do PostgreSQL)
-   - Adicione `PORT` se necessário (o Railway define automaticamente, mas pode usar 3001 como fallback)
+- **Com Docker (`docker-compose.yml`)**:
+  - O serviço `db` já expõe a porta 5432 e cria o banco `projeto_backend`;
+  - Use a mesma `DATABASE_URL` do exemplo acima.
 
-5. **Configure o serviço:**
-   - O Railway detectará automaticamente o Dockerfile
-   - O `railway.json` já está configurado para rodar migrations antes de iniciar
-   - O deploy iniciará automaticamente
+- **Em produção (Railway)**:
+  - Ao adicionar um banco PostgreSQL no projeto, o Railway cria automaticamente a variável `DATABASE_URL`;
+  - Basta garantir que o serviço Node use essa variável (o código já lê de `process.env.DATABASE_URL`).
 
-6. **Execute o seed (opcional):**
-   - Após o primeiro deploy, você pode executar o seed via Railway CLI ou conectando diretamente:
-   ```bash
-   # Via Railway CLI
-   railway run npm run seed
-   ```
+---
 
-7. **Acesse a aplicação:**
-   - O Railway gerará uma URL pública automaticamente
-   - Exemplo: `https://seu-projeto.up.railway.app`
-   - Swagger UI estará disponível em: `https://seu-projeto.up.railway.app/docs`
+## Scripts npm úteis
 
-### Notas importantes
-- As migrations são executadas automaticamente durante o deploy (via `railway.json`)
-- O Railway detecta mudanças no Git e faz redeploy automático
-- A variável `DATABASE_URL` é injetada automaticamente quando você adiciona o PostgreSQL
-- O `PORT` é definido automaticamente pelo Railway, mas o código tem fallback para 3001
+- `npm start` → inicia o servidor para produção (usa `node src/app.js` ou script equivalente)  
+- `npm run dev` → inicia o servidor em modo desenvolvimento (nodemon, se configurado)  
+- `node scripts/seed.js` → roda o seed e popula o banco com os JSON em `data/`  
+- `npx prisma migrate dev --name <nome>` → cria/aplica migrations em desenvolvimento  
+- `npx prisma db push` → aplica o schema diretamente no banco (sem migration)  
+- `npx prisma generate` → (re)gera o client Prisma  
+- `npx prisma studio` → abre uma interface web para visualizar/editar os dados
 
-## Estrutura do Projeto
+---
 
-```
+## Estrutura do projeto
+
+```text
 projeto-backend/
-├── data/                 # Arquivos JSON para seed
+├── data/                    # Arquivos JSON para seed
 │   ├── instituicoes.json
 │   └── programas.json
 ├── prisma/
-│   ├── schema.prisma    # Schema do banco de dados
-│   └── migrations/      # Migrations do Prisma
+│   ├── schema.prisma        # Schema do banco de dados
+│   └── migrations/          # Migrations do Prisma
 ├── scripts/
-│   └── seed.js         # Script para popular o banco
+│   ├── seed.js              # Script para popular o banco
+│   ├── start.js             # Script auxiliar para start em produção
+│   └── wait-for-db.js       # Aguarda o banco subir (Docker/Railway)
 ├── src/
-│   ├── app.js          # Aplicação Express
-│   └── routes/         # Rotas da API
-├── Dockerfile          # Para deploy no Railway
-├── railway.json        # Configuração do Railway
-├── docker-compose.yml  # Para desenvolvimento local
+│   ├── app.js               # Aplicação Express (ponto de entrada)
+│   ├── routes/              # Rotas HTTP
+│   │   ├── instituicoes.js
+│   │   └── programas.js
+│   ├── controllers/         # Controllers (camada de orquestração)
+│   │   ├── instituicaoController.js
+│   │   └── programaController.js
+│   ├── services/            # Camada de regra de negócio
+│   │   ├── instituicaoService.js
+│   │   └── programaService.js
+│   └── repositories/        # Acesso ao banco via Prisma
+│       ├── instituicaoRepository.js
+│       └── programaRepository.js
+├── openapi.json             # Especificação OpenAPI/Swagger
+├── Dockerfile               # Build da imagem para produção (ex.: Railway)
+├── docker-compose.yml       # Stack de desenvolvimento local (API + Postgres)
+├── railway.json             # Configuração de deploy/migrations no Railway
 └── package.json
+```
+
+---
+
+## Deploy no Railway (resumo)
+
+1. Faça commit do código e envie para um repositório Git remoto.
+2. Crie um projeto no Railway e conecte ao repositório.
+3. Adicione um banco PostgreSQL no projeto (o Railway criará a variável `DATABASE_URL`).
+4. Confirme que o serviço Node está usando `DATABASE_URL` e `PORT` (o Railway define `PORT`; o código usa `process.env.PORT || 3001`).
+5. O `Dockerfile` e o `railway.json` já estão preparados para rodar migrations antes de subir a app.
+6. Após o primeiro deploy, rode o seed, se desejar:
+
+```bash
+railway run node scripts/seed.js
 ```
