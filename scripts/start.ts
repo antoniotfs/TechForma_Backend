@@ -91,7 +91,7 @@ async function start(): Promise<void> {
     console.log('✅ Starting application...');
     // Inicia a aplicação diretamente
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    require('../dist/src/app.js');
+    require('../app.js');
   } catch (error) {
     console.error('❌ Fatal error during startup:', error);
     process.exit(1);

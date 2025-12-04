@@ -2,7 +2,7 @@
   "name": "projeto-backend",
   "version": "1.0.0",
   "description": "Backend scaffold (Express + Prisma) generated from user mocks",
-  "main": "dist/src/app.js",
+  "main": "dist/app.js",
   "scripts": {
     "build": "tsc && prisma generate",
     "start": "node dist/app.js",
