@@ -19,9 +19,6 @@ RUN npx prisma generate
 # Build TypeScript
 RUN npm run build
 
-# Make startup script executable
-RUN chmod +x scripts/start.sh
-
 # Expose port
 EXPOSE 3001
 
