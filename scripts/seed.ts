@@ -1,22 +1,3 @@
-/**
- * Seed script for populating the database.
- *
- * IMPORTANT:
- * - Place two JSON files into the `data/` folder:
- *   1) data/instituicoes.json
- *   2) data/programas.json
- *
- * You can copy your existing mocks from the workspace:
- * - /mnt/data/instituicoes.ts
- * - /mnt/data/programas.ts
- *
- * Convert them to JSON arrays named like above, or paste the JS arrays into JSON files.
- *
- * Example:
- * ts-node scripts/seed.ts
- *
- */
-
 import * as fs from 'fs';
 import * as path from 'path';
 import { PrismaClient } from '@prisma/client';
@@ -25,12 +6,22 @@ const prisma = new PrismaClient();
 
 interface ProgramaData {
   id: string;
+  instituicaoId?: string;
+  titulo?: string;
+  area?: string;
+  modalidade?: string;
+  nivel?: string;
+  publicoAlvo?: string;
   periodoInscricao?: {
     inicio: string | Date;
     fim: string | Date;
   };
   periodoInicio?: string;
   periodoFim?: string;
+  cidade?: string;
+  estado?: string;
+  resumo?: string;
+  descricaoCompleta?: string;
   tags?: string[];
   [key: string]: unknown;
 }
@@ -41,12 +32,7 @@ async function main(): Promise<void> {
   const progPath = path.join(base, 'data', 'programas.json');
 
   if (!fs.existsSync(instPath) || !fs.existsSync(progPath)) {
-    console.error('Missing data files. Please copy the JSON exports of your mocks to:');
-    console.error(instPath);
-    console.error(progPath);
-    console.error('\nYou can use the uploaded files from the workspace:');
-    console.error(' - /mnt/data/instituicoes.ts');
-    console.error(' - /mnt/data/programas.ts');
+    console.error('Missing data files.');
     process.exit(1);
   }
 
@@ -64,25 +50,39 @@ async function main(): Promise<void> {
 
   console.log('Seeding programs...');
   for (const p of progData) {
-    // convert periodo to periodoInicio and periodoFim ISO strings
-    let periodoInicio: string;
-    let periodoFim: string;
     
-    if (p.periodoInscricao) {
-      periodoInicio = new Date(p.periodoInscricao.inicio).toISOString();
-      periodoFim = new Date(p.periodoInscricao.fim).toISOString();
-    } else {
-      periodoInicio = p.periodoInicio || new Date().toISOString();
-      periodoFim = p.periodoFim || new Date().toISOString();
-    }
-    
-    const payload = Object.assign({}, p, {
+    // Converte datas
+    const periodoInicio = p.periodoInscricao
+      ? new Date(p.periodoInscricao.inicio).toISOString()
+      : p.periodoInicio || new Date().toISOString();
+
+    const periodoFim = p.periodoInscricao
+      ? new Date(p.periodoInscricao.fim).toISOString()
+      : p.periodoFim || new Date().toISOString();
+
+    // Construção COMPLETA do payload exigido pelo Prisma
+    const payload = {
+      id: p.id,
+      instituicaoId: p.instituicaoId || instData[0]?.id || "1",
+
+      titulo: p.titulo || "Título não informado",
+      area: p.area || "Geral",
+      modalidade: p.modalidade || "Presencial",
+      nivel: p.nivel || "Livre",
+      publicoAlvo: p.publicoAlvo || "Estudantes",
+
       periodoInicio,
       periodoFim,
-      tags: p.tags || []
-    });
-    // remove periodoInscricao to match Prisma fields
-    delete (payload as { periodoInscricao?: unknown }).periodoInscricao;
+
+      cidade: p.cidade || "Cidade não informada",
+      estado: p.estado || "UF",
+
+      resumo: p.resumo || "Resumo não informado",
+      descricaoCompleta: p.descricaoCompleta || "Descrição não informada",
+
+      tags: p.tags || [],
+    };
+
     await prisma.programa.upsert({
       where: { id: p.id },
       update: payload,
@@ -101,4 +101,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

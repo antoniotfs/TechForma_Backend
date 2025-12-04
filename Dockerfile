@@ -8,7 +8,7 @@ COPY prisma ./prisma
 
 # Install all dependencies (including dev for Prisma CLI)
 # This will run postinstall which generates Prisma Client
-RUN npm ci
+RUN npm install
 
 # Copy rest of source code
 COPY . .
