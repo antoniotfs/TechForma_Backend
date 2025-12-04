@@ -1,6 +1,8 @@
-module.exports = (instituicaoService) => {
+import { InstituicaoController, InstituicaoService, ExpressRequest, ExpressResponse, ExpressNext } from '../types';
+
+export default (instituicaoService: InstituicaoService): InstituicaoController => {
   return {
-    listarTodas: async (req, res, next) => {
+    listarTodas: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       try {
         console.log('[GET /instituicoes] Listando todas as instituições');
         const items = await instituicaoService.listarTodas();
@@ -10,7 +12,7 @@ module.exports = (instituicaoService) => {
       }
     },
 
-    buscarPorId: async (req, res, next) => {
+    buscarPorId: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[GET /instituicoes/${id}] Buscando instituição por ID`);
@@ -21,7 +23,7 @@ module.exports = (instituicaoService) => {
       }
     },
 
-    criar: async (req, res, next) => {
+    criar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       try {
         console.log('[POST /instituicoes] Criando nova instituição:', req.body);
         const data = req.body;
@@ -33,7 +35,7 @@ module.exports = (instituicaoService) => {
       }
     },
 
-    atualizar: async (req, res, next) => {
+    atualizar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[PUT /instituicoes/${id}] Atualizando instituição:`, req.body);
@@ -45,7 +47,7 @@ module.exports = (instituicaoService) => {
       }
     },
 
-    deletar: async (req, res, next) => {
+    deletar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[DELETE /instituicoes/${id}] Deletando instituição`);
@@ -57,5 +59,4 @@ module.exports = (instituicaoService) => {
     },
   };
 };
-
 

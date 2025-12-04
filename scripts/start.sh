@@ -3,7 +3,7 @@
 # Aguarda o banco estar pronto, roda migrations e inicia a aplicação
 
 echo "🔄 Waiting for database to be ready..."
-node scripts/wait-for-db.js
+node dist/scripts/wait-for-db.js
 
 if [ $? -ne 0 ]; then
   echo "❌ Failed to connect to database. Exiting."

@@ -16,6 +16,9 @@ COPY . .
 # Ensure Prisma Client is generated (redundant but safe)
 RUN npx prisma generate
 
+# Build TypeScript
+RUN npm run build
+
 # Make startup script executable
 RUN chmod +x scripts/start.sh
 

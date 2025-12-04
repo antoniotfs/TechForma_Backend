@@ -13,17 +13,29 @@
  * Convert them to JSON arrays named like above, or paste the JS arrays into JSON files.
  *
  * Example:
- * node scripts/seed.js
+ * ts-node scripts/seed.ts
  *
  */
 
-const fs = require('fs');
-const path = require('path');
-const { PrismaClient } = require('@prisma/client');
+import * as fs from 'fs';
+import * as path from 'path';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-async function main() {
+interface ProgramaData {
+  id: string;
+  periodoInscricao?: {
+    inicio: string | Date;
+    fim: string | Date;
+  };
+  periodoInicio?: string;
+  periodoFim?: string;
+  tags?: string[];
+  [key: string]: unknown;
+}
+
+async function main(): Promise<void> {
   const base = path.resolve(__dirname, '..');
   const instPath = path.join(base, 'data', 'instituicoes.json');
   const progPath = path.join(base, 'data', 'programas.json');
@@ -39,7 +51,7 @@ async function main() {
   }
 
   const instData = JSON.parse(fs.readFileSync(instPath, 'utf-8'));
-  const progData = JSON.parse(fs.readFileSync(progPath, 'utf-8'));
+  const progData: ProgramaData[] = JSON.parse(fs.readFileSync(progPath, 'utf-8'));
 
   console.log('Seeding institutions...');
   for (const i of instData) {
@@ -53,15 +65,24 @@ async function main() {
   console.log('Seeding programs...');
   for (const p of progData) {
     // convert periodo to periodoInicio and periodoFim ISO strings
-    const periodoInicio = new Date(p.periodoInscricao.inicio).toISOString();
-    const periodoFim = new Date(p.periodoInscricao.fim).toISOString();
+    let periodoInicio: string;
+    let periodoFim: string;
+    
+    if (p.periodoInscricao) {
+      periodoInicio = new Date(p.periodoInscricao.inicio).toISOString();
+      periodoFim = new Date(p.periodoInscricao.fim).toISOString();
+    } else {
+      periodoInicio = p.periodoInicio || new Date().toISOString();
+      periodoFim = p.periodoFim || new Date().toISOString();
+    }
+    
     const payload = Object.assign({}, p, {
       periodoInicio,
       periodoFim,
       tags: p.tags || []
     });
     // remove periodoInscricao to match Prisma fields
-    delete payload.periodoInscricao;
+    delete (payload as { periodoInscricao?: unknown }).periodoInscricao;
     await prisma.programa.upsert({
       where: { id: p.id },
       update: payload,
@@ -80,3 +101,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

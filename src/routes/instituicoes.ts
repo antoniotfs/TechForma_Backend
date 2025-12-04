@@ -1,9 +1,10 @@
-const express = require('express');
-const createInstituicaoRepository = require('../repositories/instituicaoRepository');
-const createInstituicaoService = require('../services/instituicaoService');
-const createInstituicaoController = require('../controllers/instituicaoController');
+import express, { Router } from 'express';
+import { PrismaClient } from '@prisma/client';
+import createInstituicaoRepository from '../repositories/instituicaoRepository';
+import createInstituicaoService from '../services/instituicaoService';
+import createInstituicaoController from '../controllers/instituicaoController';
 
-module.exports = (prisma) => {
+export default (prisma: PrismaClient): Router => {
   const router = express.Router();
 
   const repository = createInstituicaoRepository(prisma);

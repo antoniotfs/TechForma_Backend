@@ -5,7 +5,7 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "node scripts/start.js",
+    "startCommand": "node dist/scripts/start.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 2
   }

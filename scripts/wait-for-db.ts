@@ -1,13 +1,13 @@
 /**
  * Script para aguardar o banco de dados estar disponível antes de rodar migrations
  */
-const { PrismaClient } = require('@prisma/client');
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const maxRetries = 30;
 const retryDelay = 2000; // 2 segundos
 
-async function waitForDatabase() {
+async function waitForDatabase(): Promise<boolean> {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await prisma.$queryRaw`SELECT 1`;

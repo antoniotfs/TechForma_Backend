@@ -1,9 +1,11 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const { PrismaClient } = require('@prisma/client');
-const swaggerUi = require('swagger-ui-express');
-const openapi = require('../openapi.json');
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { PrismaClient } from '@prisma/client';
+import swaggerUi from 'swagger-ui-express';
+import openapi from '../openapi.json';
+import instituicoesRouter from './routes/instituicoes';
+import programasRouter from './routes/programas';
 
 dotenv.config();
 
@@ -14,7 +16,7 @@ const prisma = new PrismaClient({
 const app = express();
 
 // Logging middleware para debug
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl || req.path}`);
   console.log(`Headers:`, JSON.stringify(req.headers, null, 2));
   if (req.body && Object.keys(req.body).length > 0) {
@@ -28,11 +30,8 @@ app.use(express.json());
 
 const port = process.env.PORT || 3001;
 
-const instituicoesRouter = require('./routes/instituicoes');
-const programasRouter = require('./routes/programas');
-
 // Swagger UI - deve vir antes das rotas da API para evitar conflitos
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi, {
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi as unknown as swaggerUi.JsonObject, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'API - Programas e Instituições'
 }));
@@ -41,14 +40,15 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapi, {
 app.use('/instituicoes', instituicoesRouter(prisma));
 app.use('/programas', programasRouter(prisma));
 
-app.get('/', (req, res) => res.send({ ok: true }));
+app.get('/', (req: Request, res: Response) => res.send({ ok: true }));
 
-app.get('/health', async (req, res) => {
+app.get('/health', async (req: Request, res: Response) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: 'ok', database: 'connected' });
   } catch (error) {
-    res.status(503).json({ status: 'error', database: 'disconnected', error: error.message });
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    res.status(503).json({ status: 'error', database: 'disconnected', error: errorMessage });
   }
 });
 
@@ -69,3 +69,4 @@ app.listen(port, () => {
   console.log(`✅ Server running on port ${port}`);
   console.log(`📚 Swagger UI available at http://localhost:${port}/docs`);
 });
+

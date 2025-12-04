@@ -1,6 +1,8 @@
-module.exports = (programaService) => {
+import { ProgramaController, ProgramaService, ExpressRequest, ExpressResponse, ExpressNext } from '../types';
+
+export default (programaService: ProgramaService): ProgramaController => {
   return {
-    listarTodos: async (req, res, next) => {
+    listarTodos: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       try {
         console.log('[GET /programas] Listando todos os programas');
         const items = await programaService.listarTodos();
@@ -10,7 +12,7 @@ module.exports = (programaService) => {
       }
     },
 
-    buscarPorId: async (req, res, next) => {
+    buscarPorId: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[GET /programas/${id}] Buscando programa por ID`);
@@ -21,7 +23,7 @@ module.exports = (programaService) => {
       }
     },
 
-    criar: async (req, res, next) => {
+    criar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       try {
         console.log('[POST /programas] Criando novo programa:', req.body);
         const payload = req.body;
@@ -32,7 +34,7 @@ module.exports = (programaService) => {
       }
     },
 
-    atualizar: async (req, res, next) => {
+    atualizar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[PUT /programas/${id}] Atualizando programa:`, req.body);
@@ -44,7 +46,7 @@ module.exports = (programaService) => {
       }
     },
 
-    deletar: async (req, res, next) => {
+    deletar: async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
       const { id } = req.params;
       try {
         console.log(`[DELETE /programas/${id}] Deletando programa`);
@@ -56,5 +58,4 @@ module.exports = (programaService) => {
     },
   };
 };
-
 

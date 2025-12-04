@@ -2,8 +2,8 @@
  * Script de startup para Railway
  * Aguarda o banco estar pronto, roda migrations e inicia a aplicação
  */
-const { execSync } = require('child_process');
-const { PrismaClient } = require('@prisma/client');
+import { execSync } from 'child_process';
+import { PrismaClient } from '@prisma/client';
 
 // Verifica se DATABASE_URL está configurada
 if (!process.env.DATABASE_URL) {
@@ -21,7 +21,7 @@ const prisma = new PrismaClient({
 const maxRetries = 20; // Reduzido para 20 tentativas (40 segundos)
 const retryDelay = 2000; // 2 segundos
 
-async function waitForDatabase() {
+async function waitForDatabase(): Promise<boolean> {
   console.log('🔄 Waiting for database to be ready...');
   
   for (let i = 0; i < maxRetries; i++) {
@@ -32,8 +32,9 @@ async function waitForDatabase() {
       return true;
     } catch (error) {
       const attempt = i + 1;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       if (attempt % 5 === 0 || attempt === maxRetries) {
-        console.log(`⏳ Waiting for database... (${attempt}/${maxRetries}) - ${error.message}`);
+        console.log(`⏳ Waiting for database... (${attempt}/${maxRetries}) - ${errorMessage}`);
       }
       if (i < maxRetries - 1) {
         await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -50,7 +51,7 @@ async function waitForDatabase() {
   return false;
 }
 
-async function runMigrations() {
+async function runMigrations(): Promise<boolean> {
   console.log('🔄 Running database migrations...');
   try {
     // Tenta conectar primeiro para garantir que o banco está acessível
@@ -66,17 +67,18 @@ async function runMigrations() {
     return true;
   } catch (error) {
     // Se o erro for sobre migrations já aplicadas, continua
-    if (error.message && error.message.includes('already applied')) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    if (errorMessage.includes('already applied')) {
       console.log('ℹ️  Migrations already applied, continuing...');
       return true;
     }
-    console.error('❌ Migration failed:', error.message);
+    console.error('❌ Migration failed:', errorMessage);
     console.log('⚠️  Attempting to continue - application may work if migrations are already applied');
     return true; // Continua mesmo se migration falhar
   }
 }
 
-async function start() {
+async function start(): Promise<void> {
   try {
     const dbReady = await waitForDatabase();
     if (!dbReady) {
@@ -88,7 +90,8 @@ async function start() {
 
     console.log('✅ Starting application...');
     // Inicia a aplicação diretamente
-    require('../src/app.js');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('../dist/src/app.js');
   } catch (error) {
     console.error('❌ Fatal error during startup:', error);
     process.exit(1);
